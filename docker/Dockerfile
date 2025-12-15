@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:debian-slim
+FROM ghcr.io/astral-sh/uv:0.9.17-bookworm-slim
 
 WORKDIR /app
 
