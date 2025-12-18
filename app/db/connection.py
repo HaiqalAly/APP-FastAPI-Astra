@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy import text
 from app.core.config import CONFIG
+from app.db.models.models import Base
 
 DB_URL = f"postgresql+asyncpg://{CONFIG.POSTGRES_USER}:{CONFIG.POSTGRES_PASSWORD}@db/{CONFIG.POSTGRES_DB}"
 
@@ -11,6 +11,5 @@ engine = create_async_engine(
 
 async def init_db():
     async with engine.begin() as conn:
-        result = await conn.execute(text("SELECT 1"))
-        print(result.scalar())
-        print("Database connection initialized.") 
+        await conn.run_sync(Base.metadata.create_all)
+        print("Database initialized and tables created.")
