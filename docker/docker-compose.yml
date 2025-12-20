@@ -11,11 +11,14 @@ services:
       - ../.env
     depends_on:
       - db
+    volumes:
+      - ../alembic/versions:/app/alembic/versions
+      - /app/.venv
     develop:
       watch:
         - action: sync
           path: ../app
-          target: /app
+          target: /app/app
           ignore:
             - "**/__pycache__/**"
             - "**/*.pyc"
