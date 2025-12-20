@@ -3,21 +3,21 @@ name: app-fastapi-astra
 services:
   app:
     build:
-      context: ..
-      dockerfile: ./docker/Dockerfile
+      context: .
+      dockerfile: ./Dockerfile
     ports:
       - "8000:8000"
     env_file:
-      - ../.env
+      - ./.env
     depends_on:
       - db
     volumes:
-      - ../alembic/versions:/app/alembic/versions
+      - ./alembic/versions:/app/alembic/versions
       - /app/.venv
     develop:
       watch:
         - action: sync
-          path: ../app
+          path: ./app
           target: /app/app
           ignore:
             - "**/__pycache__/**"
@@ -26,12 +26,12 @@ services:
             - .env
             - .git/
         - action: rebuild
-          path: ../pyproject.toml
+          path: ./pyproject.toml
 
   db:
     image: postgres:latest
     env_file:
-      - ../.env
+      - ./.env
     volumes:
       - db_data:/var/lib/postgresql
 

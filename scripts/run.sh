@@ -1,3 +1,3 @@
 set -e
 
-docker compose -f docker/docker-compose.yml up --build "$@"
+docker compose up -d
