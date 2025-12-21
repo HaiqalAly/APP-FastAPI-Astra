@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
-from app.db.connection import get_db
+from app.db.connection import get_db, engine
 from contextlib import asynccontextmanager
 
 # Lifespan events to initialize the database connection
@@ -9,8 +9,8 @@ from contextlib import asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Starting up...")
     yield
-
     print("Shutting down...")
+    await engine.dispose()
 
 app = FastAPI(
     lifespan=lifespan
