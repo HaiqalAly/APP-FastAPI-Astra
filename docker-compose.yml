@@ -13,7 +13,6 @@ services:
       - db
     volumes:
       - ./alembic/versions:/app/alembic/versions
-      - /app/.venv
     develop:
       watch:
         - action: sync
