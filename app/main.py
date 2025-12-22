@@ -1,12 +1,16 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
-from app.db.connection import get_db, engine
 from contextlib import asynccontextmanager
+
+from app.db.connection import get_db, engine
+from app.core.config import CONFIG
 
 # Lifespan events to initialize the database connection
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if not CONFIG.SECRET_KEY:
+        raise ValueError("SECRET_KEY is not set in the configuration.")
     print("Starting up...")
     yield
     print("Shutting down...")
