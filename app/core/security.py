@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
 import jwt
-from app.core.config import CONFIG
+from app.core.config import CONFIG, TokenExpiredError, InvalidTokenError, TokenError
 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
@@ -17,17 +17,42 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=CONFIG.ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "type": "access"})
     encoded_jwt = jwt.encode(to_encode, CONFIG.SECRET_KEY, algorithm=CONFIG.ALGORITHM)
     return encoded_jwt
 
-def verify_access_token(token: str) -> dict | None:
+def verify_access_token(token: str) -> dict:
     try:
         payload = jwt.decode(token, CONFIG.SECRET_KEY, algorithms=[CONFIG.ALGORITHM])
         if "sub" not in payload:
-            return None
+            raise InvalidTokenError("Token missing 'sub' claim")
+        if payload.get("type") != "access":
+            raise InvalidTokenError("Invalid token type")
         return payload
     except jwt.ExpiredSignatureError:
-        return None
+        raise TokenExpiredError("Token has expired")
     except jwt.PyJWTError:
-        return None
+        raise InvalidTokenError("Invalid token")
+    
+def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> str:
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=CONFIG.REFRESH_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire, "type": "refresh"})
+    encoded_jwt = jwt.encode(to_encode, CONFIG.SECRET_KEY, algorithm=CONFIG.ALGORITHM)
+    return encoded_jwt
+
+def verify_refresh_token(token: str) -> dict:
+    try:
+        payload = jwt.decode(token, CONFIG.SECRET_KEY, algorithms=[CONFIG.ALGORITHM])
+        if "sub" not in payload:
+            raise InvalidTokenError("Token missing 'sub' claim")
+        if payload.get("type") != "refresh":
+            raise InvalidTokenError("Invalid token type")
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise TokenExpiredError("Token has expired")
+    except jwt.PyJWTError:
+        raise InvalidTokenError("Invalid token")
