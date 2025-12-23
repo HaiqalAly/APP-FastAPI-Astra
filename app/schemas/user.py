@@ -38,10 +38,6 @@ class UserUpdate(BaseModel):
     password: Optional[ValidatedPassword] = None
     is_active: Optional[bool] = None
 
-class UserLogin(BaseModel):
-    username: str
-    password: str
-
 class UserResponse(UserBase):
     id: int
     role: UserRole
