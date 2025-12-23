@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from app.db.connection import get_db, engine
 from app.core.config import CONFIG
+from app.api.v1.endpoints import auth, users
 
 # Lifespan events to initialize the database connection
 @asynccontextmanager
@@ -38,3 +39,6 @@ async def test_db(db: AsyncSession = Depends(get_db)):
         "user": row[2],
         "session_closed": False 
     }
+
+app.include_router(auth.router, prefix="/api/v1")
+app.include_router(users.router, prefix="/api/v1")
