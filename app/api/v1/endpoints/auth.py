@@ -7,7 +7,8 @@ from typing import Annotated
 from app.db.connection import get_db
 from app.db import crud
 from app.schemas.user import UserCreate, UserResponse, Token, RefreshTokenPayload
-from app.core.config import CONFIG, TokenExpiredError, InvalidTokenError
+from app.core.config import CONFIG
+from app.core.exceptions import TokenExpiredError, InvalidTokenError
 from app.core import security
 from app.api.dependencies import get_current_active_user, require_role
 

@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import verify_access_token
-from app.core.config import TokenExpiredError, InvalidTokenError
+from app.core.exceptions import TokenExpiredError, InvalidTokenError
 from app.db.connection import get_db
 from app.db.crud import get_user_by_username
 from app.db.models.models import User
