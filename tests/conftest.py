@@ -10,7 +10,8 @@ from app.db.models.models import Base, User
 from app.core.security import get_password_hash
 from app.core.config import CONFIG
 
-TEST_DATABASE_URL = f"postgresql+asyncpg://{CONFIG.POSTGRES_USER}:{CONFIG.POSTGRES_PASSWORD}@localhost:5432/{CONFIG.POSTGRES_DB}"
+# Use separate PostgreSQL database for testing
+TEST_DATABASE_URL = f"postgresql+asyncpg://{CONFIG.POSTGRES_TEST_USER}:{CONFIG.POSTGRES_TEST_PASSWORD}@localhost:5433/{CONFIG.POSTGRES_TEST_DB}"
 
 engine = create_async_engine(TEST_DATABASE_URL, poolclass=NullPool)
 TestingSessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)

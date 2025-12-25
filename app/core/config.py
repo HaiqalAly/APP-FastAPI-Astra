@@ -18,5 +18,10 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = ""
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
+    
+    # Testing configuration
+    POSTGRES_TEST_USER: str = ""
+    POSTGRES_TEST_PASSWORD: str = ""
+    POSTGRES_TEST_DB: str = ""
 
 CONFIG = Settings()
