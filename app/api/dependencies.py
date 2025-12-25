@@ -55,13 +55,14 @@ async def get_current_active_user(
     return current_user
 
 def require_role(allowed_roles: list[UserRole]):
+    role_names = ", ".join([role.value for role in allowed_roles])
     async def role_checker(
         current_user: Annotated[User, Depends(get_current_active_user)]
     ) -> User:
         if current_user.role not in [role.value for role in allowed_roles]:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Insufficient permissions. Required role: {[r.value for r in allowed_roles]}",
+                detail=f"Operation requires one of the following roles: {role_names}",
             )
         return current_user
     return role_checker

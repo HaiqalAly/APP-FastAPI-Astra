@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy import String, DateTime, func
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
+from app.schemas.user import UserRole
 
 Base = declarative_base()
 
@@ -9,7 +10,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    role: Mapped[str] = mapped_column(String(50), nullable=False, default='user')
+    role: Mapped[UserRole] = mapped_column(default=UserRole.USER, nullable=False)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
 
