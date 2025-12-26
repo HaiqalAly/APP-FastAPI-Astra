@@ -12,48 +12,33 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def _create_token(data: dict, expires_delta: timedelta | None, token_type: str, default_minutes: int) -> str:
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=CONFIG.ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire, "type": "access"})
-    encoded_jwt = jwt.encode(to_encode, CONFIG.SECRET_KEY, algorithm=CONFIG.ALGORITHM)
-    return encoded_jwt
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=default_minutes))
+    to_encode.update({"exp": expire, "type": token_type})
+    return jwt.encode(to_encode, CONFIG.SECRET_KEY, algorithm=CONFIG.ALGORITHM)
+
+def _verify_token(token: str, expected_type: str) -> dict:
+    try:
+        payload = jwt.decode(token, CONFIG.SECRET_KEY, algorithms=[CONFIG.ALGORITHM])
+        if "sub" not in payload:
+            raise InvalidTokenError("Token missing 'sub' claim")
+        if payload.get("type") != expected_type:
+            raise InvalidTokenError(f"Invalid token type: expected {expected_type}")
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise TokenExpiredError()
+    except jwt.PyJWTError:
+        raise InvalidTokenError()
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+    return _create_token(data, expires_delta, "access", CONFIG.ACCESS_TOKEN_EXPIRE_MINUTES)
 
 def verify_access_token(token: str) -> dict:
-    try:
-        payload = jwt.decode(token, CONFIG.SECRET_KEY, algorithms=[CONFIG.ALGORITHM])
-        if "sub" not in payload:
-            raise InvalidTokenError("Token missing 'sub' claim")
-        if payload.get("type") != "access":
-            raise InvalidTokenError("Invalid token type")
-        return payload
-    except jwt.ExpiredSignatureError:
-        raise TokenExpiredError("Token has expired")
-    except jwt.PyJWTError:
-        raise InvalidTokenError("Invalid token")
-    
+    return _verify_token(token, "access")
+
 def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> str:
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=CONFIG.REFRESH_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire, "type": "refresh"})
-    encoded_jwt = jwt.encode(to_encode, CONFIG.SECRET_KEY, algorithm=CONFIG.ALGORITHM)
-    return encoded_jwt
+    return _create_token(data, expires_delta, "refresh", CONFIG.REFRESH_TOKEN_EXPIRE_MINUTES)
 
 def verify_refresh_token(token: str) -> dict:
-    try:
-        payload = jwt.decode(token, CONFIG.SECRET_KEY, algorithms=[CONFIG.ALGORITHM])
-        if "sub" not in payload:
-            raise InvalidTokenError("Token missing 'sub' claim")
-        if payload.get("type") != "refresh":
-            raise InvalidTokenError("Invalid token type")
-        return payload
-    except jwt.ExpiredSignatureError:
-        raise TokenExpiredError("Token has expired")
-    except jwt.PyJWTError:
-        raise InvalidTokenError("Invalid token")
+    return _verify_token(token, "refresh")

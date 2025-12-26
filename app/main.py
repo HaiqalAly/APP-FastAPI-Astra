@@ -5,6 +5,15 @@ from contextlib import asynccontextmanager
 
 from app.db.connection import get_db, engine
 from app.core.config import CONFIG
+from app.core.exceptions import (
+    UserAlreadyExistsError,
+    InvalidCredentialsError,
+    InactiveUserError,
+    TokenExpiredError,
+    InvalidTokenError,
+    InsufficientPermissionsError
+)
+from app.core import handlers
 from app.api.v1.endpoints import auth, users
 
 # Lifespan events to initialize the database connection
@@ -20,6 +29,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     lifespan=lifespan
 )
+
+# Register global exception handlers
+app.add_exception_handler(UserAlreadyExistsError, handlers.user_already_exists_handler)
+app.add_exception_handler(InvalidCredentialsError, handlers.invalid_credentials_handler)
+app.add_exception_handler(InactiveUserError, handlers.inactive_user_handler)
+app.add_exception_handler(InsufficientPermissionsError, handlers.insufficient_permissions_handler)
+app.add_exception_handler(TokenExpiredError, handlers.token_expired_handler)
+app.add_exception_handler(InvalidTokenError, handlers.invalid_token_handler)
 
 @app.get("/")
 def root():
