@@ -1,21 +1,85 @@
-# FastAPI Codename: Astra - Learning Backend Development
+# FastAPI Authentication API - Codename: Astra
 
-## Project Background
-> A learning project from my 3rd semester (sophomore year) where I'm teaching myself backend development beyond what's covered in class. Trying to understand how real APIs work by building one myself.
+> **Student Learning Project** - A self-directed exploration of backend development fundamentals during my sophomore year. This project represents my journey in understanding modern web API architecture, authentication patterns, and asynchronous Python programming.
+
+## Overview
+
+A RESTful API built with FastAPI implementing JWT-based authentication and role-based access control (RBAC). This project serves as both a practical learning experience and a portfolio piece demonstrating foundational backend development skills.
+
+### Project Goals
+- Understand asynchronous programming patterns in Python
+- Implement secure authentication and authorization mechanisms
+- Practice database design and ORM usage
+- Learn containerization with Docker
+- Apply software engineering best practices in a real-world context
+
+## Features
+
+### ✅ Implemented
+- **User Authentication**
+  - Registration with input validation
+  - Login with JWT access and refresh tokens
+  - Token refresh mechanism
+  - Password hashing using PBKDF2-SHA256 via Passlib
+
+- **Authorization**
+  - Role-based access control (ADMIN, MODERATOR, USER)
+  - Protected endpoints using FastAPI dependency injection
+  - Permission validation middleware
+
+- **Database**
+  - PostgreSQL with async SQLAlchemy 2.0
+  - User model with timestamps and role management
+  - Alembic migrations for schema versioning
+
+- **Infrastructure**
+  - Docker Compose orchestration
+  - Separate development and test databases
+  - Health checks and service dependencies
+
+### 🚧 Areas for Improvement
+- Test coverage (currently minimal, focused on core auth flows)
+- Comprehensive logging and monitoring
+- Enhanced error messages and validation feedback
+- Email verification system
+- Password reset functionality
+- User profile management endpoints
+- Rate limiting implementation
+
+## Tech Stack
+- Framework: FastAPI (async)
+- Database: PostgreSQL 16
+- ORM: SQLAlchemy 2.0 (async)
+- Migrations: Alembic
+- Authentication: PyJWT (Access & Refresh Tokens)
+- Security: Passlib (PBKDF2-SHA256)
+- Testing: Pytest + Pytest-Asyncio
+- Containerization: Docker & Docker Compose
+- Package Manager: uv
+- Code Style: Ruff
 
 ## Getting Started
 
 ### Prerequisites
 - [uv](https://docs.astral.sh/uv/) - Fast Python package manager
-- [Docker](https://www.docker.com/) - For running PostgreSQL and the app
+- [Docker Desktop](https://www.docker.com/) - For containerized services
 
-### Setup
-1. Clone the repository
-2. Install dependencies:
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/HaiqalAly/APP-FastAPI-Astra
+   cd APP-FastAPI-Astra
+   ```
+
+2. **Install dependencies**
    ```bash
    uv sync
    ```
-3. Create a `.env` file in the root directory with your configuration or just use the provided .env.example (delete the .example):
+
+3. **Configure environment variables**
+   
+   Create a `.env` file in the project root (or rename `.env.example`):
    ```env
    SECRET_KEY=your-secret-key-here
    POSTGRES_USER=your_user
@@ -26,71 +90,79 @@
    POSTGRES_TEST_PASSWORD=test_password
    POSTGRES_TEST_DB=test_db
    ```
-4. Build and start the containers:
+
+4. **Start the application**
    ```bash
    docker compose up --build
    ```
-5. The API will be available at `http://localhost:8000`
-   - API docs: `http://localhost:8000/docs`
 
-## What I've Built So Far
+5. **Access the API**
+   - API: `http://localhost:8000`
+   - Interactive docs: `http://localhost:8000/docs`
+   - Alternative docs: `http://localhost:8000/redoc`
 
-### Basic Setup (Working)
-- **FastAPI App**: Got a basic async API running with FastAPI. Still learning how all the async/await stuff actually works.
-- **PostgreSQL + Docker**: Database runs in Docker containers. Took a while to figure out docker-compose but it's working now.
-- **Alembic Migrations**: Database versioning tool. Made 2 migrations so far - one for user activation and one for roles. Struggled a lot getting Alembic to work with async SQLAlchemy - kept running into sync/async conflicts. Eventually found a template in the Alembic docs for pyproject_async setups and used that instead. Still not 100% confident with migrations.
+### Development Scripts
 
-### Authentication (Mostly Working)
-- **JWT Tokens**: Applied JWT authentication patterns with a focus on token lifecycle management.
-- **Password Hashing**: Implemented industry-standard PBKDF2-SHA256 hashing via Passlib.
-- **Register/Login**: Basic endpoints work. Added some validation like password requirements (8 chars, uppercase, lowercase, digit).
-- **Token Refresh**: Got the refresh token endpoint working after some trial and error with the token validation.
+Helper scripts are available in the `scripts/` directory:
+- `run.sh` - Start the application
+- `down.sh` - Stop services
+- `logs.sh` - View container logs
+- `watch.sh` - Development mode with hot reload
 
-### Authorization (Functional but Basic)
-- **Role System**: Added ADMIN, MODERATOR, and USER roles. Evaluating the scalability of this RBAC implementation for future growth.
-- **Protected Routes**: Dependency injection for checking roles. Seems like a FastAPI pattern but still wrapping my head around how dependencies compose.
-- **Few Protected Endpoints**: Made a couple test endpoints for admin/moderator access to make sure the role checking works.
+## API Structure
 
-### Database (Learning as I Go)
-- **SQLAlchemy 2.0**: Using the new async version. Confusing rating 10/10.
-- **User Model**: Basic table with username, email, password hash, role, and timestamps. Pretty standard stuff.
-- **CRUD Functions**: Can create users, look them up by username/email, and authenticate. Nothing fancy.
+```
+app/
+├── api/v1/endpoints/    # API route handlers
+│   ├── auth.py         # Authentication endpoints
+│   ├── users.py        # User management
+│   ├── admin.py        # Admin operations
+│   └── moderator.py    # Moderator operations
+├── core/               # Core functionality
+│   ├── config.py       # Configuration management
+│   ├── security.py     # Security utilities
+│   └── exceptions.py   # Custom exceptions
+├── db/                 # Database layer
+│   ├── connection.py   # Database connection
+│   ├── crud.py         # Database operations
+│   └── models/         # SQLAlchemy models
+├── schemas/            # Pydantic schemas
+└── services/           # Business logic
+```
 
-### What Could Be Better
-- **Testing**: Only have 3 basic tests. Current priority is core feature development; expanding async test coverage is in the roadmap.
-- **Error Messages**: Some error messages are vague. Should make them more user-friendly.
-- **Security**: Probably missing some security best practices I don't know about yet.
-- **Code Organization**: Some files are getting messy. Not sure if my separation of concerns is actually good.
-- **Documentation**: No proper API docs setup besides the auto-generated FastAPI ones.
-- **Logging**: Barely any logging. Just print statements in some places.
+## Testing
 
-### What's Missing
-- Email verification (no email service configured)
-- Password reset (seems complicated with tokens and email)
-- User profile updates (can create users but can't update them yet)
-- Rate limiting (no idea how to implement this properly maybe Redis?)
-- Proper test coverage (maybe 20% covered?)
-- CI/CD (haven't learned this yet)
-- Production deployment considerations (environment configs are basic)
+Run the test suite:
+```bash
+pytest tests/ -v
+```
 
-### Tech Stack
-- **uv** - Fast Python package manager (use `uv sync` to install dependencies)
-- **FastAPI** - Python web framework (async)
-- **PostgreSQL** - Database
-- **SQLAlchemy 2.0** - ORM (async version)
-- **Alembic** - Database migrations
-- **Docker & Docker Compose** - Containerization
-- **PyJWT** - JWT tokens
-- **Passlib** - Password hashing
-- **Pytest** - Testing (barely)
+## Key Learning Outcomes
 
-### Current State
-The API works for basic user registration and authentication. You can create an account, login, get a token, and access protected routes. It's functional but definitely a learning project with rough edges. I'm learning a lot about async Python, database design, and API security patterns.
+Through this project, I've gained practical experience with:
 
-### What I'm Learning
-- Async programming is harder than I thought
-- Database sessions and connection management is tricky
-- Security is more complex than "just hash the password"
-- Docker is really helpful once you get past the initial learning curve
-- FastAPI's dependency injection is powerful but takes time to understand
-- Writing tests makes you realize how many edge cases you missed
+- **Asynchronous Programming**: Understanding async/await patterns, event loops, and managing async database sessions
+- **Authentication & Security**: Implementing JWT tokens, password hashing, and secure credential management
+- **Database Management**: Schema design, migrations, and the complexities of async ORM operations
+- **API Design**: RESTful principles, endpoint structuring, and response modeling
+- **Dependency Injection**: Leveraging FastAPI's DI system for clean, testable code
+- **Containerization**: Docker orchestration, service dependencies, and development workflows
+- **Testing**: Writing async tests and understanding the importance of comprehensive test coverage
+
+## Project Status
+
+**Current State**: Functional MVP with core authentication features operational
+
+This project is under active development as a learning exercise. While the implemented features are functional and follow industry patterns, there are known areas for enhancement and refinement. Feedback and suggestions for improvement are welcome.
+
+## Acknowledgments
+
+This project was built by following best practices from official documentation, community resources, and online tutorials. Special thanks to the FastAPI, SQLAlchemy, and Python communities for their excellent documentation and support materials.
+
+## License
+
+See [LICENSE](LICENSE) file for details.
+
+---
+
+*Built with curiosity and determination by a student learning backend development one endpoint at a time.*
