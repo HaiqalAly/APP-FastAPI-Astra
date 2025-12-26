@@ -100,3 +100,7 @@ prepend_sys_path = [
 # executable = "ruff"
 # options = "check --fix REVISION_SCRIPT_FILENAME"
 
+
+[tool.ruff]
+exclude = ["alembic"]
+

@@ -5,8 +5,9 @@ from app.schemas.user import UserRole
 
 Base = declarative_base()
 
+
 class User(Base):
-    __tablename__ = 'auth_users'
+    __tablename__ = "auth_users"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
