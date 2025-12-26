@@ -2,6 +2,8 @@ FROM ghcr.io/astral-sh/uv:0.9.17-bookworm-slim
 
 WORKDIR /app
 
+ENV UV_PROJECT_ENVIRONMENT="/venv"
+
 COPY pyproject.toml uv.lock /app/
 
 RUN uv sync --locked

@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from typing import Annotated
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_active_user, require_role
 from app.db.models.models import User
-from app.schemas.user import UserResponse, UserRole
+from app.db.connection import get_db
+from app.db.crud import update_user, delete_user
+from app.schemas.user import UserResponse, UserRole, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -15,28 +18,18 @@ async def get_current_user_profile(
     """Get current authenticated user profile"""
     return current_user
 
-
-@router.get("/admin-dashboard")
-async def admin_dashboard(
-    current_user: Annotated[User, Depends(require_role([UserRole.ADMIN]))],
+@router.patch("/me", response_model=UserResponse)
+async def update_profile(
+    user_update: UserUpdate,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    db: AsyncSession = Depends(get_db)
 ):
-    """Admin-only endpoint - requires ADMIN role"""
-    return {
-        "message": f"Welcome to admin dashboard, {current_user.username}!",
-        "role": current_user.role,
-        "access_level": "administrator",
-    }
+    updated_user = await update_user(db, current_user, user_update)
+    return updated_user
 
-
-@router.get("/moderator-panel")
-async def moderator_panel(
-    current_user: Annotated[
-        User, Depends(require_role([UserRole.ADMIN, UserRole.MODERATOR]))
-    ],
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_profile(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    db: AsyncSession = Depends(get_db)
 ):
-    """Moderator and Admin access - requires MODERATOR or ADMIN role"""
-    return {
-        "message": f"Welcome to moderator panel, {current_user.username}!",
-        "role": current_user.role,
-        "access_level": "moderator or higher",
-    }
+    await delete_user(db, current_user)

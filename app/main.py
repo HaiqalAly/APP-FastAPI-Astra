@@ -14,7 +14,7 @@ from app.core.exceptions import (
     InsufficientPermissionsError,
 )
 from app.core import handlers
-from app.api.v1.endpoints import auth, users
+from app.api.v1.endpoints import auth, users, admin, moderator
 
 
 # Lifespan events to initialize the database connection
@@ -66,3 +66,5 @@ async def test_db(db: AsyncSession = Depends(get_db)):
 
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
+app.include_router(admin.router, prefix="/api/v1")
+app.include_router(moderator.router, prefix="/api/v1")
