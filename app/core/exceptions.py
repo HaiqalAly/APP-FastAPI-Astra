@@ -1,3 +1,5 @@
+from typing import Optional
+
 class AuthenticationError(Exception):
     """Base exception for all auth issues."""
 
@@ -39,3 +41,11 @@ class UserAlreadyExistsError(AuthenticationError):
         self.field = field
         msg = message or f"{field.capitalize()} already exists"
         super().__init__(msg)
+
+
+class InvalidPasswordConfirmationError(AuthenticationError):
+    default_message = "Invalid password confirmation"
+
+
+class InvalidConfirmationTextError(AuthenticationError):
+    default_message = "Confirmation text must be 'DELETE MY ACCOUNT'"

@@ -69,3 +69,7 @@ class TokenPayload(BaseModel):
 
 class RefreshTokenPayload(BaseModel):
     refresh_token: str
+
+class DeleteAccountConfirmation(BaseModel):
+    password: str
+    confirm_text: Optional[str] = "DELETE MY ACCOUNT"

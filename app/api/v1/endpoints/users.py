@@ -6,7 +6,9 @@ from app.api.dependencies import get_current_active_user, require_role
 from app.db.models.models import User
 from app.db.connection import get_db
 from app.db.crud import update_user, delete_user
-from app.schemas.user import UserResponse, UserRole, UserUpdate
+from app.schemas.user import UserResponse, UserRole, UserUpdate, DeleteAccountConfirmation
+from app.core.security import verify_password
+from app.core.exceptions import InvalidPasswordConfirmationError, InvalidConfirmationTextError
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -29,7 +31,14 @@ async def update_profile(
 
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_profile(
+    confirmation: DeleteAccountConfirmation,
     current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db)
 ):
+    if not verify_password(confirmation.password, current_user.hashed_password):
+        raise InvalidPasswordConfirmationError()
+    
+    if confirmation.confirm_text is not None and confirmation.confirm_text != "DELETE MY ACCOUNT":
+        raise InvalidConfirmationTextError()
+    
     await delete_user(db, current_user)

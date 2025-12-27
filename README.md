@@ -27,6 +27,11 @@ A RESTful API built with FastAPI implementing JWT-based authentication and role-
   - Protected endpoints using FastAPI dependency injection
   - Permission validation middleware
 
+- **User Account Management**
+  - Profile retrieval
+  - Profile updates
+  - Secure profile deletion requiring authentication and password verification
+
 - **Database**
   - PostgreSQL with async SQLAlchemy 2.0
   - User model with timestamps and role management
@@ -38,12 +43,11 @@ A RESTful API built with FastAPI implementing JWT-based authentication and role-
   - Health checks and service dependencies
 
 ### 🚧 Areas for Improvement
-- Test coverage (currently minimal, focused on core auth flows)
+- Test coverage
 - Comprehensive logging and monitoring
 - Enhanced error messages and validation feedback
 - Email verification system
 - Password reset functionality
-- User profile management endpoints
 - Rate limiting implementation
 
 ## Tech Stack
@@ -148,6 +152,21 @@ Through this project, I've gained practical experience with:
 - **Dependency Injection**: Leveraging FastAPI's DI system for clean, testable code
 - **Containerization**: Docker orchestration, service dependencies, and development workflows
 - **Testing**: Writing async tests and understanding the importance of comprehensive test coverage
+
+## Engineering Trade-offs & Experiments
+
+As a student project, Astra serves as a playground for testing architectural patterns beyond standard tutorial implementations. One of the most significant decisions was to deviate from the common "Soft Delete" pattern.
+
+**The "Hard Delete" Experiment**
+
+While most resources recommend a deleted_at column (Soft Delete), I chose a Hard Delete approach to evaluate its impact on real-world development:
+- Query Simplicity: I wanted to maintain "clean" endpoints without the overhead of filtering WHERE deleted_at IS NULL on every retrieval.
+- Database Performance: By physically removing records, I could observe how leaner database indexes contribute to response times.
+- Data Integrity: This approach allowed me to handle unique constraints naturally, avoiding the "ghost record" conflict where a new user cannot register with a deleted user's handle.
+
+**The Safety Compromise:** To prevent "accidental finality," I shifted the safety logic from the database schema to a High-Friction API Contract. I implemented a multi-factor deletion process:
+- Identity Verification: Validating the current user's password.
+- Intent Verification: Requiring the exact string "DELETE MY ACCOUNT" in the request body.
 
 ## Project Status
 

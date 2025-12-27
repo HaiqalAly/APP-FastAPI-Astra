@@ -28,3 +28,11 @@ async def token_expired_handler(request: Request, exc: Exception):
 
 async def invalid_token_handler(request: Request, exc: Exception):
     return JSONResponse(status_code=401, content={"detail": str(exc)})
+
+
+async def invalid_password_confirmation_handler(request: Request, exc: Exception):
+    return JSONResponse(status_code=401, content={"detail": str(exc)})
+
+
+async def invalid_confirmation_text_handler(request: Request, exc: Exception):
+    return JSONResponse(status_code=400, content={"detail": str(exc)})

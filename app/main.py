@@ -12,6 +12,8 @@ from app.core.exceptions import (
     TokenExpiredError,
     InvalidTokenError,
     InsufficientPermissionsError,
+    InvalidPasswordConfirmationError,
+    InvalidConfirmationTextError,
 )
 from app.core import handlers
 from app.api.v1.endpoints import auth, users, admin, moderator
@@ -39,6 +41,8 @@ app.add_exception_handler(
 )
 app.add_exception_handler(TokenExpiredError, handlers.token_expired_handler)
 app.add_exception_handler(InvalidTokenError, handlers.invalid_token_handler)
+app.add_exception_handler(InvalidPasswordConfirmationError, handlers.invalid_password_confirmation_handler)
+app.add_exception_handler(InvalidConfirmationTextError, handlers.invalid_confirmation_text_handler)
 
 
 @app.get("/")
