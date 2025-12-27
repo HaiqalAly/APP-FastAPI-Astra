@@ -1,5 +1,3 @@
-from typing import Optional
-
 class AuthenticationError(Exception):
     """Base exception for all auth issues."""
 

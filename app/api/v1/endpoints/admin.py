@@ -7,6 +7,7 @@ from app.schemas.user import UserRole
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+
 @router.get("/admin-dashboard")
 async def admin_dashboard(
     current_user: Annotated[User, Depends(require_role([UserRole.ADMIN]))],

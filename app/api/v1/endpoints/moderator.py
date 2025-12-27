@@ -7,6 +7,7 @@ from app.schemas.user import UserRole
 
 router = APIRouter(prefix="/moderator", tags=["moderator"])
 
+
 @router.get("/moderator-panel")
 async def moderator_panel(
     current_user: Annotated[

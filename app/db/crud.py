@@ -28,6 +28,7 @@ async def create_user(db: AsyncSession, user_create: UserCreate) -> User:
     await db.refresh(new_user)
     return new_user
 
+
 async def update_user(db: AsyncSession, db_user: User, user_update: UserUpdate) -> User:
     update_data = user_update.model_dump(exclude_unset=True)
 
@@ -44,9 +45,11 @@ async def update_user(db: AsyncSession, db_user: User, user_update: UserUpdate) 
 
     return db_user
 
+
 async def delete_user(db: AsyncSession, db_user: User) -> None:
     await db.delete(db_user)
     await db.commit()
+
 
 async def authenticate_user(
     db: AsyncSession, username: str, password: str
